@@ -1,0 +1,32 @@
+version: '3'
+services:
+
+  registration:
+    image: ndp/registration:latest
+    container_name: ndp-registration
+    build:
+      context: registration
+      dockerfile: Dockerfile
+    environment:
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_DB
+      - POSTGRES_HOST
+      - POSTGRES_PORT
+      - GIN_MODE
+    ports:
+      - "8080:8080"
+    # entrypoint: ["tail", "-f", "/dev/null"]
+
+  postgres:
+    image: postgis/postgis
+    container_name: ndp-postgres
+    environment:
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_DB
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
