@@ -5,7 +5,7 @@ services:
     image: ndp/registration:latest
     container_name: ndp-registration
     build:
-      context: registration
+      context: src
       dockerfile: Dockerfile
     environment:
       - POSTGRES_USER
