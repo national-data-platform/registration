@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/pelicanplatform/pelican/client"
 	"github.com/pelicanplatform/pelican/config"
 	"github.com/pelicanplatform/pelican/namespaces"
 	"github.com/spf13/viper"
@@ -31,4 +32,14 @@ func GetNamespaces() ([]models.Namespaces, error) {
 		allNs = append(allNs, iNS)
 	}
 	return allNs, nil
+}
+
+func GetBestCache() ([]string, error) {
+	cacheListName := "xroot"
+	// var bestCaches []string
+	bestCaches, err := client.GetBestCache(cacheListName)
+	if err != nil {
+		log.Println("Failed to get best caches:", err)
+	}
+	return bestCaches, nil
 }

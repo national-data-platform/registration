@@ -9,6 +9,16 @@ import (
 	"gorm.io/gorm"
 )
 
+// GET /bestcache
+// Get best cache based on geolocation in osdf
+func GetBestCache(c *gin.Context) {
+	bestcache, err := utilities.GetBestCache()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	}
+	c.JSON(http.StatusOK, gin.H{"data": bestcache})
+}
+
 // GET /namespaces
 // Get all namespaces in osdf
 func GetNamespaces(c *gin.Context) {
