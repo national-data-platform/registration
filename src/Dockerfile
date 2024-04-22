@@ -13,6 +13,7 @@ COPY go.sum go.sum
 COPY controllers controllers
 COPY models models
 COPY utilities utilities
+COPY input.txt input.txt
 
 RUN go mod download
 COPY main.go main.go

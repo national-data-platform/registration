@@ -7,7 +7,28 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
+	"io/ioutil"
 )
+
+type osdfPath struct {
+    Name     string  `json:"name"`
+}
+
+// GET /download
+// Get file
+func GetFile(c *gin.Context) {
+	var newPath osdfPath
+	if err := c.BindJSON(&newPath); err != nil {
+        return
+    }
+	fileName := newPath.Name
+	inputFile, err := ioutil.ReadFile(fileName)
+    if err != nil {
+        panic(err)
+    }
+	c.Header("Content-Disposition", "attachment; filename="+fileName)
+	c.Data(http.StatusOK, "application/data", inputFile)
+}
 
 // GET /bestcache
 // Get best cache based on geolocation in osdf

@@ -15,6 +15,7 @@ func main() {
 		c.Next()
 	})
 
+	r.POST("/download", controllers.GetFile)
 	r.GET("/bestcache", controllers.GetBestCache)
 	r.GET("/namespaces", controllers.GetNamespaces)
 	r.GET("/datasets", controllers.GetDatasets)
