@@ -1,6 +1,7 @@
 package utilities
 
 import (
+	"context"
 	"log"
 	"os"
 
@@ -22,7 +23,8 @@ func GetNamespaces() ([]models.Namespaces, error) {
 	if err != nil {
 		log.Println("Failed to init config client: ", err)
 	}
-	osdfNS, err := namespaces.GetNamespaces()
+	ctx := context.Background()
+	osdfNS, err := namespaces.GetNamespaces(ctx)
 	if err != nil {
 		log.Println("Failed to get namespaces: ", err)
 	}
