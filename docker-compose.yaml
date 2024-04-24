@@ -4,6 +4,7 @@ services:
   registration:
     image: ndp/registration:latest
     container_name: ndp-registration
+    platform: "linux/amd64"
     build:
       context: src
       dockerfile: Dockerfile
@@ -21,6 +22,7 @@ services:
   postgres:
     image: postgis/postgis
     container_name: ndp-postgres
+    platform: "linux/amd64"
     environment:
       - POSTGRES_USER
       - POSTGRES_PASSWORD
