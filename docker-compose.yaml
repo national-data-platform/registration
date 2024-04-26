@@ -15,6 +15,7 @@ services:
       - POSTGRES_HOST
       - POSTGRES_PORT
       - GIN_MODE
+      - FEDERATION_DISCOVERY_URL
     ports:
       - "8080:8080"
     # entrypoint: ["tail", "-f", "/dev/null"]

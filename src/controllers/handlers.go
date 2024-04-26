@@ -27,11 +27,12 @@ func GetFile(c *gin.Context) {
 	if err := c.BindJSON(&newPath); err != nil {
 		return
 	}
-
+	federationDiscovURL := os.Getenv("FEDERATION_DISCOVERY_URL")
+	log.Println("federationDiscovURL: ", federationDiscovURL)
 	log.Println("Initializing pelican init client")
 	viper.Reset()
 	config.InitConfig()
-	viper.Set("Federation.DiscoveryUrl", "https://osg-htc.org")
+	viper.Set("Federation.DiscoveryUrl", federationDiscovURL)
 	err := config.InitClient()
 	if err != nil {
 		log.Println("Failed to init pelican client:", err)
