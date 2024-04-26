@@ -27,16 +27,12 @@ func GetFile(c *gin.Context) {
 	if err := c.BindJSON(&newPath); err != nil {
 		return
 	}
-	fileName := newPath.Name
-	inputFile, err := os.ReadFile(fileName)
-	if err != nil {
-		panic(err)
-	}
+
 	log.Println("Initializing pelican init client")
 	viper.Reset()
 	config.InitConfig()
 	viper.Set("Federation.DiscoveryUrl", "https://osg-htc.org")
-	err = config.InitClient()
+	err := config.InitClient()
 	if err != nil {
 		log.Println("Failed to init pelican client:", err)
 	}
@@ -47,9 +43,8 @@ func GetFile(c *gin.Context) {
 		}
 	}()
 	project := "" // Used for condor jobs
-	localDestination := "test.txt"
-	remoteObject := "/ospool/uc-shared/public/OSG-Staff/validation/test.txt"
-	remoteObjectUrl, err := url.Parse(remoteObject)
+	localDestination := "tmp"
+	remoteObjectUrl, err := url.Parse(newPath.Name)
 	if err != nil {
 		log.Println("Failed to parse source URL:", err)
 	}
@@ -73,9 +68,19 @@ func GetFile(c *gin.Context) {
 			err = result.Error
 		}
 	}
+
+	inputFile, err := os.ReadFile(localDestination)
+	if err != nil {
+		panic(err)
+	}
 	log.Println("Downloaded results:", downloaded)
-	c.Header("Content-Disposition", "attachment; filename="+fileName)
+	c.Header("Content-Disposition", "attachment; filename="+newPath.Name)
 	c.Data(http.StatusOK, "application/data", inputFile)
+	//Remove file
+	err = os.Remove(localDestination)
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 // GET /bestcache
