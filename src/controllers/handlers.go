@@ -11,6 +11,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/pelicanplatform/pelican/client"
+	"github.com/pelicanplatform/pelican/config"
+	"github.com/spf13/viper"
 	"gorm.io/gorm"
 )
 
@@ -30,15 +32,20 @@ func GetFile(c *gin.Context) {
 	if err != nil {
 		panic(err)
 	}
-	//Pelican object transfer
-	// ctx := context.Background()
+	log.Println("Initializing pelican init client")
+	viper.Reset()
+	config.InitConfig()
+	viper.Set("Federation.DiscoveryUrl", "https://osg-htc.org")
+	err = config.InitClient()
+	if err != nil {
+		log.Println("Failed to init pelican client:", err)
+	}
 	te := client.NewTransferEngine(c)
 	defer func() {
 		if err := te.Shutdown(); err != nil {
 			log.Println("Failure when shutting down transfer engine:", err)
 		}
 	}()
-	var options []client.TransferOption
 	project := "" // Used for condor jobs
 	localDestination := "test.txt"
 	remoteObject := "/ospool/uc-shared/public/OSG-Staff/validation/test.txt"
@@ -46,7 +53,7 @@ func GetFile(c *gin.Context) {
 	if err != nil {
 		log.Println("Failed to parse source URL:", err)
 	}
-	tc, err := te.NewClient(options...)
+	tc, err := te.NewClient()
 	if err != nil {
 		log.Println("Failure when creating new client:", err)
 	}
