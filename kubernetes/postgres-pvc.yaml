@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: osdf-postgresvol
+spec:
+  storageClassName: seaweedfs-storage-nvme
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 100Gi

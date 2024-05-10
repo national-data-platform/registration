@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: osdf-api
+  labels:
+    k8s-app: osdf-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: osdf-api
+  template:
+    metadata:
+      labels:
+        k8s-app: osdf-api
+    spec:
+      containers:
+      - name: osdf-api
+        image: iperezx/osdf-api:0.1.0
+        imagePullPolicy: Always
+        envFrom:
+        - secretRef:
+            name: osdf-env
+        resources:
+          limits:
+            cpu: 3
+            memory: 4Gi
+          requests:
+            cpu: 3
+            memory: 4Gi
+        ports:
+        - name: osdf-api
+          containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: osdf-api
+spec:
+  ports:
+    - port: 8080
+      targetPort: 8080
+  selector:
+    k8s-app: osdf-api
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: haproxy
+    ingress.kubernetes.io/timeout-server: "1200s"
+  name: osdf-api-ingress
+spec:
+  rules:
+  - host: osdf-api.nrp-nautilus.io
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: osdf-api
+            port:
+              number: 8080
+  tls:
+  - hosts:
+    - osdf-api.nrp-nautilus.io
