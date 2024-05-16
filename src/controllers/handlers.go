@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net/http"
 	"net/url"
@@ -27,14 +26,14 @@ type osdfPath struct {
 func UploadFile(c *gin.Context) {
 	file, err := c.FormFile("file")
 	if err != nil {
-		c.String(http.StatusBadRequest, "get form err: %s", err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"get form err": err.Error()})
 		return
 	}
 	log.Println(file.Filename)
 	fileName := filepath.Base(file.Filename)
 
 	if err := c.SaveUploadedFile(file, fileName); err != nil {
-		c.String(http.StatusBadRequest, "upload file err: %s", err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"upload file error": err.Error()})
 		return
 	}
 	//Remove file
@@ -42,7 +41,7 @@ func UploadFile(c *gin.Context) {
 	if err != nil {
 		log.Println(err)
 	}
-	c.String(http.StatusOK, fmt.Sprintf("'%s' uploaded!", file.Filename))
+	c.JSON(http.StatusOK, gin.H{"file uploaded": file.Filename})
 }
 
 // POST /download
