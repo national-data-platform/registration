@@ -2,10 +2,12 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"net/url"
 	"os"
+	"path/filepath"
 	"registration/models"
 	"registration/utilities"
 
@@ -20,7 +22,27 @@ type osdfPath struct {
 	Name string `json:"name"`
 }
 
-// GET /download
+// POST /upload
+// Upload file
+func UploadFile(c *gin.Context) {
+	file, err := c.FormFile("file")
+	if err != nil {
+		c.String(http.StatusBadRequest, "get form err: %s", err.Error())
+		return
+	}
+	log.Println(file.Filename)
+	fileName := filepath.Base(file.Filename)
+	c.SaveUploadedFile(file, fileName)
+
+	//Remove file
+	err = os.Remove(fileName)
+	if err != nil {
+		log.Println(err)
+	}
+	c.String(http.StatusOK, fmt.Sprintf("'%s' uploaded!", file.Filename))
+}
+
+// POST /download
 // Get file
 func GetFile(c *gin.Context) {
 	var newPath osdfPath
