@@ -32,8 +32,11 @@ func UploadFile(c *gin.Context) {
 	}
 	log.Println(file.Filename)
 	fileName := filepath.Base(file.Filename)
-	c.SaveUploadedFile(file, fileName)
 
+	if err := c.SaveUploadedFile(file, fileName); err != nil {
+		c.String(http.StatusBadRequest, "upload file err: %s", err.Error())
+		return
+	}
 	//Remove file
 	err = os.Remove(fileName)
 	if err != nil {
