@@ -40,6 +40,7 @@ func UploadFile(c *gin.Context) {
 	log.Println(osdfupload.File.Filename)
 	log.Println(osdfupload.Name)
 	log.Println(osdfupload.Token)
+
 	fileName := filepath.Base(osdfupload.File.Filename)
 
 	if err := c.SaveUploadedFile(osdfupload.File, fileName); err != nil {
@@ -72,7 +73,7 @@ func UploadFile(c *gin.Context) {
 	if err != nil {
 		log.Println("Failure when creating new client:", err)
 	}
-	tj, err := tc.NewTransferJob(context.Background(), remoteObjectUrl, fileName, false, false, project)
+	tj, err := tc.NewTransferJob(context.Background(), remoteObjectUrl, fileName, true, false, project)
 	if err != nil {
 		log.Println("Failure when creating new transfer job:", err)
 	}
