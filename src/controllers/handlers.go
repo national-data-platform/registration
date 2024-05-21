@@ -3,6 +3,7 @@ package controllers
 import (
 	"context"
 	"log"
+	"mime/multipart"
 	"net/http"
 	"net/url"
 	"os"
@@ -21,27 +22,37 @@ type osdfPath struct {
 	Name string `json:"name"`
 }
 
+type osdfUpload struct {
+	File  *multipart.FileHeader `form:"file"`
+	Name  string                `form:"name"`
+	Token string                `form:"token"`
+}
+
 // POST /upload
 // Upload file
 func UploadFile(c *gin.Context) {
-	file, err := c.FormFile("file")
-	if err != nil {
+	var osdfupload osdfUpload
+	if err := c.Bind(&osdfupload); err != nil {
+		log.Println("param bind error: ", err)
 		c.JSON(http.StatusBadRequest, gin.H{"get form err": err.Error()})
-		return
 	}
-	log.Println(file.Filename)
-	fileName := filepath.Base(file.Filename)
 
-	if err := c.SaveUploadedFile(file, fileName); err != nil {
+	log.Println(osdfupload.File.Filename)
+	log.Println(osdfupload.Name)
+	log.Println(osdfupload.Token)
+
+	fileName := filepath.Base(osdfupload.File.Filename)
+
+	if err := c.SaveUploadedFile(osdfupload.File, fileName); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"upload file error": err.Error()})
 		return
 	}
 	//Remove file
-	err = os.Remove(fileName)
+	err := os.Remove(fileName)
 	if err != nil {
 		log.Println(err)
 	}
-	c.JSON(http.StatusOK, gin.H{"file uploaded": file.Filename})
+	c.JSON(http.StatusOK, gin.H{"file uploaded": osdfupload.File.Filename})
 }
 
 // POST /download
