@@ -40,15 +40,54 @@ func UploadFile(c *gin.Context) {
 	log.Println(osdfupload.File.Filename)
 	log.Println(osdfupload.Name)
 	log.Println(osdfupload.Token)
-
 	fileName := filepath.Base(osdfupload.File.Filename)
 
 	if err := c.SaveUploadedFile(osdfupload.File, fileName); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"upload file error": err.Error()})
 		return
 	}
+	federationDiscovURL := os.Getenv("FEDERATION_DISCOVERY_URL")
+	log.Println("federationDiscovURL: ", federationDiscovURL)
+	log.Println("Initializing pelican init client")
+	viper.Reset()
+	config.InitConfig()
+	viper.Set("Federation.DiscoveryUrl", federationDiscovURL)
+	err := config.InitClient()
+	if err != nil {
+		log.Println("Failed to init pelican client:", err)
+	}
+	te := client.NewTransferEngine(c)
+	defer func() {
+		if err := te.Shutdown(); err != nil {
+			log.Println("Failure when shutting down transfer engine:", err)
+		}
+	}()
+	project := "" // Used for condor jobs
+	remoteObjectUrl, err := url.Parse(osdfupload.Name)
+	if err != nil {
+		log.Println("Failed to parse source URL:", err)
+	}
+
+	tc, err := te.NewClient(client.WithToken(osdfupload.Token))
+	if err != nil {
+		log.Println("Failure when creating new client:", err)
+	}
+	tj, err := tc.NewTransferJob(context.Background(), remoteObjectUrl, fileName, false, false, project)
+	if err != nil {
+		log.Println("Failure when creating new transfer job:", err)
+	}
+	err = tc.Submit(tj)
+	if err != nil {
+		log.Println("Failure when submitting job:", err)
+	}
+	transferResults, err := tc.Shutdown()
+	for _, result := range transferResults {
+		if err == nil && result.Error != nil {
+			err = result.Error
+		}
+	}
 	//Remove file
-	err := os.Remove(fileName)
+	err = os.Remove(fileName)
 	if err != nil {
 		log.Println(err)
 	}
