@@ -4,7 +4,7 @@ go 1.21.4
 
 require (
 	github.com/gin-gonic/gin v1.9.1
-	github.com/pelicanplatform/pelican v0.0.0-20240424150815-8ea0ecc8fe33
+	github.com/pelicanplatform/pelican v0.0.0-20240523193514-48b60212e53f
 	gorm.io/driver/postgres v1.5.4
 	gorm.io/gorm v1.25.7
 )

@@ -57,13 +57,15 @@ func UploadFile(c *gin.Context) {
 	if err != nil {
 		log.Println("Failed to init pelican client:", err)
 	}
-	te := client.NewTransferEngine(c)
+	te, err := client.NewTransferEngine(c)
+	if err != nil {
+		log.Println("Failed to to create a new transfer engine:", err)
+	}
 	defer func() {
 		if err := te.Shutdown(); err != nil {
 			log.Println("Failure when shutting down transfer engine:", err)
 		}
 	}()
-	project := "" // Used for condor jobs
 	remoteObjectUrl, err := url.Parse(osdfupload.Name)
 	if err != nil {
 		log.Println("Failed to parse source URL:", err)
@@ -73,7 +75,7 @@ func UploadFile(c *gin.Context) {
 	if err != nil {
 		log.Println("Failure when creating new client:", err)
 	}
-	tj, err := tc.NewTransferJob(context.Background(), remoteObjectUrl, fileName, true, false, project)
+	tj, err := tc.NewTransferJob(context.Background(), remoteObjectUrl, fileName, true, false)
 	if err != nil {
 		log.Println("Failure when creating new transfer job:", err)
 	}
@@ -112,13 +114,15 @@ func GetFile(c *gin.Context) {
 	if err != nil {
 		log.Println("Failed to init pelican client:", err)
 	}
-	te := client.NewTransferEngine(c)
+	te, err := client.NewTransferEngine(c)
+	if err != nil {
+		log.Println("Failed to to create a new transfer engine:", err)
+	}
 	defer func() {
 		if err := te.Shutdown(); err != nil {
 			log.Println("Failure when shutting down transfer engine:", err)
 		}
 	}()
-	project := "" // Used for condor jobs
 	localDestination := "tmp"
 	remoteObjectUrl, err := url.Parse(newPath.Name)
 	if err != nil {
@@ -128,7 +132,7 @@ func GetFile(c *gin.Context) {
 	if err != nil {
 		log.Println("Failure when creating new client:", err)
 	}
-	tj, err := tc.NewTransferJob(context.Background(), remoteObjectUrl, localDestination, false, false, project)
+	tj, err := tc.NewTransferJob(context.Background(), remoteObjectUrl, localDestination, false, false)
 	if err != nil {
 		log.Println("Failure when creating new transfer job:", err)
 	}
