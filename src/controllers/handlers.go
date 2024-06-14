@@ -93,7 +93,7 @@ func UploadFile(c *gin.Context) {
 	if err != nil {
 		log.Println(err)
 	}
-	c.JSON(http.StatusOK, gin.H{"file uploaded": osdfupload.File.Filename})
+	c.JSON(http.StatusOK, gin.H{"file uploaded": osdfupload.Name})
 }
 
 // POST /download
