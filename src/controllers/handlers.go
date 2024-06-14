@@ -39,7 +39,6 @@ func UploadFile(c *gin.Context) {
 
 	log.Println(osdfupload.File.Filename)
 	log.Println(osdfupload.Name)
-	log.Println(osdfupload.Token)
 
 	fileName := filepath.Base(osdfupload.File.Filename)
 
