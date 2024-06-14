@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: osdf-postgres
+  labels:
+    k8s-app: osdf-postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: osdf-postgres
+  template:
+    metadata:
+      labels:
+        k8s-app: osdf-postgres
+    spec:
+      containers:
+      - name: osdf-postgres
+        image: postgis/postgis
+        envFrom:
+        - secretRef:
+            name: osdf-env
+        resources:
+          limits:
+            cpu: 2
+            memory: 4Gi
+          requests:
+            cpu: 2
+            memory: 4Gi
+        ports:
+        - name: osdf-postgres
+          containerPort: 5432
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data
+          name: osdf-postgresvol
+      volumes:
+      - name: osdf-postgresvol
+        persistentVolumeClaim:
+          claimName: osdf-postgresvol
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: osdf-postgres
+spec:
+  ports:
+    - port: 5432
+      targetPort: 5432
+  selector:
+    k8s-app: osdf-postgres
